@@ -1,0 +1,40 @@
+<app-header></app-header>
+<div class="main-content">
+    <div class="header-content">
+        <div class="addressbook-detail-text">
+            Person Details
+        </div>
+        <a class="add-button" routerLink="/add">
+            <img alt="">+ Add Person
+        </a>
+    </div>
+    <div class="table-main">
+        <table id="display" class="table">
+            <tr>
+                <!-- Table Headings -->
+                <th></th>
+                <th>Fullname</th>
+                <th>Address</th>
+                <th>City</th>
+                <th>State</th>
+                <th>Zip Code</th>
+                <th>Phone Number</th>
+            </tr>
+            <tr *ngFor="let addressbook of addressBookDetails">
+                <!-- Person Details-->
+                <th></th>
+                <td>{{addressbook.fullName}}</td>
+                <td>{{addressbook.address}}</td>
+                <td>{{addressbook.city}}</td>
+                <td>{{addressbook.state}}</td>
+                <td>{{addressbook.zipCode}}</td>
+                <td>{{addressbook.phoneNumber}}</td>
+                <td>
+                    <img id={{addressbook.id}} (click)="remove(addressbook.id)" src="../../../assets/icons/delete-black-18dp.svg" alt="
+                        delete">
+                    <img id={{addressbook.id}} (click)="update(addressbook)" src="../../../assets/icons/create-black-18dp.svg" alt="edit">
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
