@@ -13,7 +13,6 @@ export class DataService {
   constructor() { }
 
   changeAddressbook(addressbook: Addressbook) {
-    console.log(addressbook);
     this.addressbookSource.next(addressbook);
   }
 }

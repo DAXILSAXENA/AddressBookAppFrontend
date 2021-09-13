@@ -1,5 +1,6 @@
+import { Statement } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Addressbook } from 'src/app/model/addressbook';
@@ -15,11 +16,18 @@ export class AddComponent implements OnInit {
 
   public addressbook: Addressbook = new Addressbook;
   public addressbookFormGroup: FormGroup;
+  public leftButton: string = "Add";
+  public rightButton: string = "Reset";
+  public addressBookDetails: Addressbook[] = [];
+  public stateDetails: Array<any> = [];
+  public states: Array<any> = [];
+  public cities: Array<any> = [];
+  id: any;
 
   constructor(private fb: FormBuilder,
     private httpService: HttpService,
     private activatedRoute: ActivatedRoute,
-    private router: Router,
+    public router: Router,
     private snackBar: MatSnackBar,
     private dataService: DataService) {
 
@@ -41,19 +49,37 @@ export class AddComponent implements OnInit {
    * This method is called when the update() is hit in the HOME page.
    */
   ngOnInit(): void {
+    // if (this.activatedRoute.snapshot.params['id'] != undefined) {
+    //   this.dataService.currentAddressbook.subscribe(addressbook => {
+    //     if (Object.keys(addressbook).length !== 0) {
+    //       console.log(addressbook);
+    //       this.leftButton = "Update";
+    //       this.rightButton = "Cancel";
+    //       this.addressbookFormGroup.get('fullName')?.setValue(addressbook.fullName);
+    //       this.addressbookFormGroup.get('phoneNumber')?.setValue(addressbook.phoneNumber);
+    //       this.addressbookFormGroup.get('address')?.setValue(addressbook.address);
+    //       this.addressbookFormGroup.get('city')?.setValue(addressbook.city);
+    //       this.addressbookFormGroup.get('state')?.setValue(addressbook.state);
+    //       this.addressbookFormGroup.get('zipCode')?.setValue(addressbook.zipCode);
+    //     }
+    //     if(addressbook.state){
+    //       this.getCity(addressbook.state);
+    //     }
+    //   });
+    // }
     if (this.activatedRoute.snapshot.params['id'] != undefined) {
-      this.dataService.currentAddressbook.subscribe(addressbook => {
-        if (Object.keys(addressbook).length !== 0) {
-          console.log(addressbook);
-          this.addressbookFormGroup.get('fullName')?.setValue(addressbook.fullName);
-          this.addressbookFormGroup.get('phoneNumber')?.setValue(addressbook.phoneNumber);
-          this.addressbookFormGroup.get('address')?.setValue(addressbook.address);
-          this.addressbookFormGroup.get('city')?.setValue(addressbook.city);
-          this.addressbookFormGroup.get('state')?.setValue(addressbook.state);
-          this.addressbookFormGroup.get('zipCode')?.setValue(addressbook.zipCode);
+      this.leftButton = "Update";
+      this.rightButton = "Cancel";
+      this.id = this.activatedRoute.snapshot.params['id']
+      this.httpService.getAddressBookDetailsByID(this.id).subscribe(x => {
+        console.log(x.data);
+        this.addressbookFormGroup.patchValue(x.data);
+        if (x.data.state) {
+          this.getCity(x.data.state);
         }
       });
     }
+    this.getState();
   }
 
   /**
@@ -78,10 +104,32 @@ export class AddComponent implements OnInit {
         console.log(response);
         this.router.navigateByUrl('/home');
         this.snackBar.open("Form Submitted Successfully", "Submitted", { duration: 3000 });
+      }, error => {
+        this.snackBar.open("Phone Number already exists", "Change Number", { duration: 8000 })
       });
 
     }
 
+  }
+
+  getCity(state: any) {
+    // console.log("hi");
+    for (let i = 0; i < this.stateDetails.length; i++) {
+      if (this.stateDetails[i]?.state === state) {
+        this.cities = this.stateDetails[i]?.city;
+        console.log(this.stateDetails[i]?.city);
+      }
+    }
+  }
+
+  getState(): void {
+    this.httpService.getStateDetails().subscribe(data => {
+      this.stateDetails = data.data;
+      console.log(this.stateDetails);
+      for (let i = 0; i < this.stateDetails.length; i++) {
+        this.states.push(this.stateDetails[i]?.state);
+      }
+    });
   }
 
   /**

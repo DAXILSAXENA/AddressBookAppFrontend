@@ -30,4 +30,16 @@ export class HttpService {
   updateAddressBookDetails(body: any, id: number): Observable<any> {
     return this.httpClient.put(this.baseUrl + "/updateaddressdetails/?id=" + id , body);
   }
+
+  getStateDetails(): Observable<any> {
+    return this.httpClient.get(this.baseUrl + "/getStateDetails");
+  } 
+
+  getAddressBookDetailsByID(id: number): Observable<any> {
+    return this.httpClient.get(this.baseUrl + "/getaddressdetailsbyid",
+      {
+        headers: new HttpHeaders(),
+        params: new HttpParams().append('id', id)
+      })
+  }
 }
